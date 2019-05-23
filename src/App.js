@@ -1,14 +1,17 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Board from './board'
+import GameBoard from './gameboard'
 
 class App extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      currentplayer: null,
-      nextplayer: null,
-      gameover: false
+      currentplayer: "white",
+      nextplayer: "black",
+      gameover: false,
+      board: new Board(8)
     }
   }
 
@@ -20,16 +23,20 @@ class App extends React.Component {
     }
   }
 
+  switchTurns(){
+    this.setState({currentplayer: this.state.nextplayer, nextplayer: this.state.currentplayer})
+  }
+
   render(){
   
     return(
-      <div className = "chess-container">
+      <div className = "chess-container" style = {{textAlign: "center", display: "inline-block"}}>
         <div className = "chess-header">
           <h1>CHESS GAME!</h1>
           {this.header.bind(this)()}
         </div>
         <div className = "chess-board">
-          <GameBoard/>
+          <GameBoard board = {this.state.board}/>
         </div>
 
       </div>
