@@ -19,7 +19,7 @@ class App extends React.Component {
     if (this.state.gameover){
       return (<p>Game Over {this.state.currentplayer.name} Wins!</p>)
     }else{
-      return (<p>{this.state.currentplayer.name}'s Turn</p>)
+      return (<p>{this.state.currentplayer}'s Turn</p>)
     }
   }
 
@@ -36,7 +36,7 @@ class App extends React.Component {
           {this.header.bind(this)()}
         </div>
         <div className = "chess-board">
-          <GameBoard board = {this.state.board}/>
+          <GameBoard board = {this.state.board} switchPlayers = {this.switchTurns.bind(this)} turn = {this.state.currentplayer} />
         </div>
 
       </div>
