@@ -2,12 +2,15 @@ import {King, Queen, Knight, Bishop, Rook, Pawn} from './chess_pieces'
 
 class Board {
     constructor(size){
-        this.allGrids = this.createBoard(size)
-        this.gameOver = this.gameOver.bind(this)
+        this.allGrids = []
         this.white = []
         this.black = []
+        this.createBoard(size)
+        this.playerChecked = false
         this.placePieces("white")
         this.placePieces("black")
+        this.check = this.check.bind(this)
+        
     }
 
     moveOptions(pieceid){
@@ -15,32 +18,31 @@ class Board {
         return this.getMoves(pieceid)
     }
 
-    getMoves(pieceid){
+    getMoves(pieceid, board = this.allGrids){
         //use a switch for name of piece to get possible moves. use color to determine if paths are blocked/can't land there.
         //we can have 4 different arrays that hold the "paths" for piece, each array iterates where the absolute value is further from the grid id.
-        var chosenpiece = this.allGrids[pieceid].piece
-        
+        var chosenpiece = board[pieceid].piece
         var name = chosenpiece.name
         var moves
         switch(name){
         
             case "Pawn":
-                moves = chosenpiece.color === "white" ? whitePawn(pieceid, this.allGrids) : blackPawn(pieceid, this.allGrids)
+                moves = chosenpiece.color === "white" ? whitePawn(pieceid, board) : blackPawn(pieceid, board)
                 break;
             case "Queen":
-                moves = queenMove(pieceid, this.allGrids)
+                moves = queenMove(pieceid, board)
                 break;
             case "Bishop":
-                moves = bishopMove(pieceid, this.allGrids) 
+                moves = bishopMove(pieceid, board) 
                 break;
             case "Rook":
-                moves = rookMove(pieceid, this.allGrids) 
+                moves = rookMove(pieceid, board) 
                 break;
             case "Knight":
-                moves = knightMove(pieceid, this.allGrids) 
+                moves = knightMove(pieceid, board) 
                 break;
             case "King":
-                moves = kingMove(pieceid, this.allGrids)
+                moves = kingMove(pieceid, board)
                 break;
             default :
                 break;
@@ -50,12 +52,110 @@ class Board {
         return moves
 
     }
+
+    check(color, gameboard){
+        var pieces = color.slice()
+        var board = gameboard.map(x=>x)
+        for (let i = 0; i < pieces.length; i++){
+            var piece = pieces[i]
+            var moves = this.getMoves(piece, board)
+            for (let j = 0; j < moves.length; j ++){
+                var move = moves[j]
+                if (board[move].piece){
+                    if ((board[move].piece.name === "King") && (board[move].piece.color !== pieces[0].color)){
+                       
+                        return true
+                        
+                    }
+
+                }
+            }
+        }
+        return false
+    }
+
+    checkMate(color){
+        //checkmate goes through every piece of the player being checked, gets every move for each piece and 
+        //checks each move and sees if it still results in a check with that move. remember check function is the aggressors pieces.
+        
+        var pieces = this[color].map(x=>x)
+        for (let i = 0; i < pieces.length; i++){
+            var piecenumber = pieces[i]
+            var piece = this.allGrids[piecenumber].piece
+            var moves = this.getMoves(piecenumber)
+            for (let j = 0; j < moves.length; j++){
+                var copyboard = this.mockBoard()
+                //this wasn't working because ITS TRANSFERRING THE OBJECT OVER NOT CREATING A COPY OF IT. so everytime we "edited" the mock board it was the 
+                //actual board because we were editing the object which was mapped over not new ones created.
+                let move = moves[j]
+                
+                
+                let reverse = color === "white" ? "black" : "white"
+                let opponentPieces = this[reverse].map(x=>x)
+                if (copyboard[move].piece !== null){
+                    opponentPieces.splice(opponentPieces.indexOf(move),1)
+                }
+                copyboard[move].piece = piece
+                copyboard[piecenumber].piece = null
+                if(!(this.check(opponentPieces, copyboard))){
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    mockBoard(){
+        return this.allGrids.map(x=>{
+            if (x.piece === null){
+                return {piece: null}
+            }else{
+                let name = x.piece.name
+                let color = x.piece.color
+                return {piece:{name: name, color: color}}
+            }
+        })
+    }
     
     movePiece(pieceid, id){
         //function moves piece to id and removes piece from former piece id
         var chosenpiece = this.allGrids[pieceid].piece 
-        this.allGrids[id].piece = chosenpiece 
-        this.allGrids[pieceid].piece = null
+        var copyboard = this.mockBoard()
+        var oppColor = chosenpiece.color === "white" ? "black" : "white"
+        let copyopponentpieces = this[oppColor].map(x=>x)
+        if (copyboard[id].piece !== null){
+            copyopponentpieces.splice(copyopponentpieces.indexOf(id),1)
+        }
+        //this removes the piece from opposing players pieces there was an "eating" action
+        copyboard[id].piece = chosenpiece 
+        copyboard[pieceid].piece = null
+        var causesCheck = this.check(copyopponentpieces, copyboard) 
+
+        if (!causesCheck){
+            if (this.allGrids[id].piece !== null){
+                let rival = this.allGrids[id].piece.color
+                this[rival].splice(this[rival].indexOf(id),1)
+            }
+            //this removes the piece from opposing players pieces there was an "eating" action
+            this.allGrids[id].piece = chosenpiece 
+            this.allGrids[pieceid].piece = null
+            this[chosenpiece.color].splice(this[chosenpiece.color].indexOf(pieceid),1)
+            this[chosenpiece.color].push(id)
+            var check = chosenpiece.color === "white" ? this.check(this.white, this.allGrids) : this.check(this.black, this.allGrids)
+            if(check){
+                alert("You've checked player")
+                this.playerChecked = true
+            }else{
+                this.playerChecked = false
+            }
+            return true
+        }else{
+            return false
+        }
+
+        
+        
+        
     }
 
     gridCreator(){
@@ -132,18 +232,10 @@ class Board {
             var grid = this.gridCreator()
             board.push(grid)
         }
-        return board
+        this.allGrids = board
     }
 
-    gameOver(player){
-        //we enter the player that was just attacked here to check for gameovers.
-        for (var i = 0; i < this.allgrids.length; i++){
-            if (this.allGrids[i].piece.owner === player){
-                return false
-            }
-        }
-        return true
-    }
+   
 
 }
 
@@ -177,20 +269,21 @@ function pawnMove(options){
     var basic = grid + direction * 8
     if (board[basic].piece === null){
         moves.push(basic)
-    }
-
-    if (board[basic-1].piece && board[basic-1].piece.color !== color){
-        moves.push(basic-1)
-    }
-
-    if (board[basic+1].piece && board[basic+1].piece.color !== color){
-        moves.push(basic+1)
-    }
-
-    if(options.start.includes(grid)){
+        if(options.start.includes(grid) &&board[basic+(8*direction)].piece === null ){
         //this will trigger state where it would be possible to en passant?
         moves.push(basic+(8*direction))
     }
+    }
+
+    if (board[basic-1].piece && board[basic-1].piece.color !== color && basic !== [0,8,16,24,32,40,48,56]){
+        moves.push(basic-1)
+    }
+
+    if (board[basic+1].piece && board[basic+1].piece.color !== color && basic !== [7,15,23,31,39,47,55,63]){
+        moves.push(basic+1)
+    }
+
+    
     //en passant
     if (grid === options.passant){
         
@@ -203,7 +296,7 @@ function pawnMove(options){
 function kingMove(id, board){
     //speical: castling, moves:one in every direction unless there's own piece
    //it's queen moves BUT LIMIT TO ONE move.
-   var moves = rookMove(id,board, true).concat(bishopMove(id,board,1))
+   var moves = rookMove(id,board, true).concat(bishopMove(id,board,2))
    return moves 
 
 }
@@ -247,7 +340,7 @@ function rookMove(id, board, king = false){
             break
         }
     }
-    for (let i = gridid-8; i > 0; i-=8){
+    for (let i = gridid-8; i > -1; i-=8){
         let move = i
 
         if (board[move].piece === null){
@@ -262,9 +355,9 @@ function rookMove(id, board, king = false){
             break
         }
     }
-    for (let i = gridid+8; i <= 63; i+=8){
+    for (let i = gridid+8; i < 64; i+=8){
         let move = i
-
+        
         if (board[move].piece === null){
             moves.push(move)
         }else{
@@ -388,7 +481,7 @@ function knightMove(id, board){
     var moves = []
     var movements = [[1,2],[-1,2],[1,-2],[-1,-2],[2,1],[2,-1],[-2,1],[-2,-1]]
     var leftrightlimits = [id - id%8, id - id%8+7]
-    var updownlimits = [id%8, (id%8)+(8*7)]
+    var updownlimits = [0, 63]
     movements.forEach(arr => {
         var leftrightmove = id + arr[0]
         //need to go left/right and see if it goes over limit at the row and then need to go up/down and see if it goes over imit at that column

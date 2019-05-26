@@ -10,13 +10,14 @@ class App extends React.Component {
     this.state = {
       currentplayer: "white",
       nextplayer: "black",
-      gameover: false,
-      board: new Board(8)
+      board: new Board(8),
+      playerChecked: false,
+      gameOver: false
     }
   }
 
   header(){
-    if (this.state.gameover){
+    if (this.state.gameOver){
       return (<p>Game Over {this.state.currentplayer.name} Wins!</p>)
     }else{
       return (<p>{this.state.currentplayer}'s Turn</p>)
@@ -24,7 +25,23 @@ class App extends React.Component {
   }
 
   switchTurns(){
-    this.setState({currentplayer: this.state.nextplayer, nextplayer: this.state.currentplayer})
+    //we can deal with this.state.board.playerChecked?
+    if (this.state.board.playerChecked){
+      //we can check if the checkmate, if not we switch players and let current player know they're being checked.
+      if (this.state.board.checkMate(this.state.nextplayer)){
+        //tell current player they've been check mated game over
+        alert("GAME OVER")
+        this.setState({gameOver: true})
+
+        this.setState({currentplayer: this.state.nextplayer, nextplayer: this.state.currentplayer, playerChecked: true})
+      }else{
+        //let current player know they've been checked.
+        this.setState({currentplayer: this.state.nextplayer, nextplayer: this.state.currentplayer, playerChecked: true})
+      }
+      //so the current player is checked.
+    }else{
+      this.setState({currentplayer: this.state.nextplayer, nextplayer: this.state.currentplayer})
+    }
   }
 
   render(){

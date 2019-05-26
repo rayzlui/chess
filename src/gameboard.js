@@ -20,9 +20,13 @@ class GameBoard extends React.Component{
     }
 
     movePiece(id){
-        this.props.board.movePiece(this.state.selectedpiece, id)
-        this.setState({selectedpiece: null, moveoptions: []})
-        this.props.switchPlayers()
+        var moveworked = this.props.board.movePiece(this.state.selectedpiece, id)
+        if (moveworked){
+            this.setState({selectedpiece: null, moveoptions: []})
+            this.props.switchPlayers()
+        }else{
+            alert("This move owuld cause you to be checked")
+        }
     }
 
     renderBoard(){
