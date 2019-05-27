@@ -10,6 +10,8 @@ class Board {
         this.placePieces("white")
         this.placePieces("black")
         this.check = this.check.bind(this)
+        this.enpassant = null 
+        //if there was a first move by a pawn that is two steps, then we will set that number as enpassant
         
     }
 
@@ -27,7 +29,7 @@ class Board {
         switch(name){
         
             case "Pawn":
-                moves = chosenpiece.color === "white" ? whitePawn(pieceid, board) : blackPawn(pieceid, board)
+                moves = chosenpiece.color === "white" ? whitePawn(pieceid, board, this.enpassant) : blackPawn(pieceid, board, this.enpassant)
                 break;
             case "Queen":
                 moves = queenMove(pieceid, board)
@@ -42,7 +44,7 @@ class Board {
                 moves = knightMove(pieceid, board) 
                 break;
             case "King":
-                moves = kingMove(pieceid, board)
+                moves = kingMove(pieceid, board, this.check)
                 break;
             default :
                 break;
@@ -62,7 +64,7 @@ class Board {
             for (let j = 0; j < moves.length; j ++){
                 var move = moves[j]
                 if (board[move].piece){
-                    if ((board[move].piece.name === "King") && (board[move].piece.color !== pieces[0].color)){
+                    if ((board[move].piece.name === "King") && (board[move].piece.color !== board[pieces[0]].piece.color)){
                        
                         return true
                         
@@ -120,28 +122,125 @@ class Board {
     movePiece(pieceid, id){
         //function moves piece to id and removes piece from former piece id
         var chosenpiece = this.allGrids[pieceid].piece 
+        
         var copyboard = this.mockBoard()
         var oppColor = chosenpiece.color === "white" ? "black" : "white"
         let copyopponentpieces = this[oppColor].map(x=>x)
-        if (copyboard[id].piece !== null){
-            copyopponentpieces.splice(copyopponentpieces.indexOf(id),1)
+        var j = id%8 === 0 ? -1 : 1
+        var dir = chosenpiece.color === "white" ? -1 : 1
+       
+        if (chosenpiece.name === "King" && chosenpiece.castle === true && copyboard[id].piece && copyboard[id].piece.name === "Rook" && copyboard[id].piece.castle === true && copyboard[id].piece.color === chosenpiece.color){
+            
+            let rook = copyboard[id].piece
+            let king = copyboard[pieceid].piece
+            copyboard[pieceid].piece = null
+            copyboard[id].piece = null
+            copyboard[pieceid+(j*2)].piece = king 
+            copyboard[pieceid+j].piece = rook
+            
+        }else if (chosenpiece.name === "Pawn" && (Math.abs(pieceid-this.enpassant) === 1) && (this.enpassant + (dir * 8) === id)){
+            copyboard[id].piece = chosenpiece
+            copyboard[pieceid].piece = null
+            copyboard[this.enpassant].piece = null
+            copyopponentpieces.splice(copyopponentpieces.indexOf(this.enpassant),1)
+        }else{
+            if (copyboard[id].piece !== null){
+                copyopponentpieces.splice(copyopponentpieces.indexOf(id),1)
+            }
+            //this removes the piece from opposing players pieces there was an "eating" action
+            copyboard[id].piece = chosenpiece 
+            copyboard[pieceid].piece = null
         }
-        //this removes the piece from opposing players pieces there was an "eating" action
-        copyboard[id].piece = chosenpiece 
-        copyboard[pieceid].piece = null
+        
         var causesCheck = this.check(copyopponentpieces, copyboard) 
 
         if (!causesCheck){
-            if (this.allGrids[id].piece !== null){
-                let rival = this.allGrids[id].piece.color
-                this[rival].splice(this[rival].indexOf(id),1)
+        
+            if (chosenpiece.name === "King" && chosenpiece.castle === true && this.allGrids[id].piece && this.allGrids[id].piece.name === "Rook" && this.allGrids[id].piece.castle === true && this.allGrids[id].piece.color === chosenpiece.color){
+                //ONLY KING WILL HAVE CASTLING OPTION.
+                let rook = this.allGrids[id].piece
+                //we're switching from rook side so this isn't guaranteed to be rook and vice versa.
+
+                let king = chosenpiece
+                this.allGrids[pieceid].piece = null
+
+                this.allGrids[id].piece = null
+                this.allGrids[pieceid+(j*2)].piece = king 
+                this.allGrids[pieceid+j].piece = rook
+                this[chosenpiece.color].splice(this[chosenpiece.color].indexOf(pieceid),1)
+                this[chosenpiece.color].splice(this[chosenpiece.color].indexOf(id),1)
+                this[chosenpiece.color].push(pieceid+(j*2),pieceid+j)
+            
+            }else if (chosenpiece.name === "Pawn" && (Math.abs(pieceid-this.enpassant) === 1) && (this.enpassant + (dir * 8) === id)){
+                let rival = this.allGrids[this.enpassant].piece.color
+                this.allGrids[id].piece = chosenpiece
+                this.allGrids[pieceid].piece = null
+                this.allGrids[this.enpassant].piece = null
+                
+                this[rival].splice(this[rival].indexOf(this.enpassant),1)
+                this[chosenpiece.color].splice(this[chosenpiece.color].indexOf(pieceid),1)
+                this[chosenpiece.color].push(id)
+            }else{
+                if (this.allGrids[id].piece !== null){
+                    let rival = this.allGrids[id].piece.color
+                    this[rival].splice(this[rival].indexOf(id),1)
+                }
+                //this removes the piece from opposing players pieces there was an "eating" action
+                this.allGrids[id].piece = chosenpiece 
+                this.allGrids[pieceid].piece = null
+                this[chosenpiece.color].splice(this[chosenpiece.color].indexOf(pieceid),1)
+                this[chosenpiece.color].push(id)
             }
-            //this removes the piece from opposing players pieces there was an "eating" action
-            this.allGrids[id].piece = chosenpiece 
-            this.allGrids[pieceid].piece = null
-            this[chosenpiece.color].splice(this[chosenpiece.color].indexOf(pieceid),1)
-            this[chosenpiece.color].push(id)
+            
+            if (chosenpiece.name === "King"||chosenpiece.name === "Rook"){
+                chosenpiece.castle = false
+            }
+           
+            if (Math.abs(pieceid - id)===16 && chosenpiece.name === "Pawn"){
+                this.enpassant = id
+            }else{
+                this.enpassant = null
+            }
+            
+            var boardEnd = chosenpiece.color === "white" ? [0,1,2,3,4,5,6,7] : [56,57,58,59,60,61,62,63]
+            if (chosenpiece.name === "Pawn" && boardEnd.includes(id)){
+                //a pawn can never go backwards on to its own back row so no need to check for color.
+                var newPiece
+                var piecename = prompt("YOUR PAWN HAS BEEN COMPLETED ITS JOURNEY, PLEASE WHAT IT SHALL NOW BECOME", "Queen Bishop Knight Rook")
+                
+                let piece = piecename.toLowerCase().trim()
+                while (!["queen", "knight", "rook", "bishop"].includes(piece)){
+                    prompt("YOUR PAWN HAS BEEN COMPLETED ITS JOURNEY, TYPE IN WHICH PIECE YOU WOULD LIKE IT TO BECOME", "Queen Bishop Knight Rook")
+                    piece = piece.toLowerCase().trim()
+                }
+
+                switch(piece){
+        
+                    
+                    case "queen":
+                        newPiece = new Queen(chosenpiece.color)
+                        break;
+                    case "bishop":
+                        newPiece = new Bishop(chosenpiece.color)
+                        break;
+                    case "rook":
+                        newPiece = new Rook(chosenpiece.color) 
+                        break;
+                    case "knight":
+                        newPiece = new Knight(chosenpiece.color) 
+                        break;
+                    
+                    default :
+                        break;
+                    
+            
+                }
+                this.allGrids[id].piece = newPiece
+
+            }
+
             var check = chosenpiece.color === "white" ? this.check(this.white, this.allGrids) : this.check(this.black, this.allGrids)
+
             if(check){
                 alert("You've checked player")
                 this.playerChecked = true
@@ -149,6 +248,9 @@ class Board {
                 this.playerChecked = false
             }
             return true
+
+            
+            
         }else{
             return false
         }
@@ -243,22 +345,24 @@ export default Board
 
 
 
-function whitePawn(gridid, board){
+function whitePawn(gridid, board, enpassant){
     var start = []
     for (var i = 48; i <= 55; i++){
         start.push(i)
     }
-    return pawnMove({board:board, color: "white", grid: gridid, direction: -1, start: start})
+    return pawnMove({board:board, color: "white", grid: gridid, direction: -1, start: start, enpassant: enpassant})
 }
-function blackPawn(gridid, board){
+function blackPawn(gridid, board, enpassant){
     var start = []
     for (var i = 8; i <= 15; i++){
         start.push(i)
     }
-    return pawnMove({board:board, color: "black", grid: gridid,direction: 1, start:start})
+    return pawnMove({board:board, color: "black", grid: gridid,direction: 1, start:start, enpassant: enpassant})
 
 }
 function pawnMove(options){
+
+    //for en passant if pawn is on the 4th row from bottom or top aka 32 - 39 and 40 - 48 and opponent piece jumps two forward.
     var grid = options.grid
     var board = options.board
     var color = options.color
@@ -267,26 +371,35 @@ function pawnMove(options){
     var moves = []
     //basic move
     var basic = grid + direction * 8
+    if (basic > 63 || basic < 0){
+        return moves
+    }
     if (board[basic].piece === null){
         moves.push(basic)
         if(options.start.includes(grid) &&board[basic+(8*direction)].piece === null ){
         //this will trigger state where it would be possible to en passant?
-        moves.push(basic+(8*direction))
-    }
+            moves.push(basic+(8*direction))
+        }
     }
 
-    if (board[basic-1].piece && board[basic-1].piece.color !== color && basic !== [0,8,16,24,32,40,48,56]){
+    if ((![0,8,16,24,32,40,48,56].includes(grid)) && board[basic-1].piece && board[basic-1].piece.color !== color ){
         moves.push(basic-1)
     }
 
-    if (board[basic+1].piece && board[basic+1].piece.color !== color && basic !== [7,15,23,31,39,47,55,63]){
+    if ((![7,15,23,31,39,47,55,63].includes(grid)) && board[basic+1].piece && board[basic+1].piece.color !== color){
         moves.push(basic+1)
     }
 
     
     //en passant
-    if (grid === options.passant){
-        
+    if (options.enpassant){
+        let move = direction * 8
+        if(options.enpassant === grid + 1){
+            moves.push(grid + 1 + move)
+        }
+        if(options.enpassant === grid - 1){
+            moves.push(grid - 1 + move)
+        }
 
     }
     
@@ -301,7 +414,7 @@ function kingMove(id, board){
 
 }
 
-function rookMove(id, board, king = false){
+function rookMove(id, board, king = false, check = false){
     //moves: until limit or piece
     var gridid = id 
     var movinggrid = board[id]
@@ -310,65 +423,121 @@ function rookMove(id, board, king = false){
     for (let i = 1; i <= gridid%8; i++){ 
         
         let move = gridid - i
-        if (board[move].piece === null){
-            moves.push(move)
-        }else{
-            if(board[move].piece.color !== movinggrid.piece.color){
+        if (!(king && i > 1)){
+            if (board[move].piece === null){
                 moves.push(move)
+            }else{
+                if(board[move].piece.color !== movinggrid.piece.color){
+                    moves.push(move)
                 
-            }
+                }
             
             break;
+            }
         }
         if (king){
-            break
+            if(board[id].piece.castle === true && check === false){
+                if (board[move].piece){
+                    if(board[move].piece.name === "Rook" && board[move].piece.castle === true){
+                        moves.push(move)
+                    }else{
+                        break
+                    }
+                }
+
+            }else{
+                break
+            }
         }
     }
     for (let i = 1; i < 8 - (gridid%8); i++){
         let move = gridid + i
 
-        if (board[move].piece === null){
-            moves.push(move)
-        }else{
-            if(board[move].piece.color !== movinggrid.piece.color){
+        if (!(king && i > 1)){
+            if (board[move].piece === null){
                 moves.push(move)
+            }else{
+                if(board[move].piece.color !== movinggrid.piece.color){
+                    moves.push(move)
                 
-            }
+                }
+            
             break;
+            }
         }
         if (king){
-            break
+            if(board[id].piece.castle === true && check === false){
+                
+                if (board[move].piece && check === false){
+                    if(board[move].piece.name === "Rook" && board[move].piece.castle === true){
+                        moves.push(move)
+                    }else{
+                        break
+                    }
+                }
+
+            }else{
+                break
+            }
         }
     }
     for (let i = gridid-8; i > -1; i-=8){
         let move = i
 
-        if (board[move].piece === null){
-            moves.push(move)
-        }else{
-            if(board[move].piece.color !== movinggrid.piece.color){
+        if (!(king && i < gridid-8)){
+            if (board[move].piece === null){
                 moves.push(move)
+            }else{
+                if(board[move].piece.color !== movinggrid.piece.color){
+                    moves.push(move)
+                
+                }
+            
+            break;
             }
-        break;
         }
         if (king){
-            break
+            if(board[id].piece.castle === true && check === false){
+                if (board[move].piece){
+                    if(board[move].piece.name === "Rook" && board[move].piece.castle === true){
+                        moves.push(move)
+                    }else{
+                        break
+                    }
+                }
+            }else{
+                break
+            }
         }
     }
     for (let i = gridid+8; i < 64; i+=8){
         let move = i
         
-        if (board[move].piece === null){
-            moves.push(move)
-        }else{
-            if(board[move].piece.color !== movinggrid.piece.color){
+        if (!(king && i > gridid+8)){
+            if (board[move].piece === null){
                 moves.push(move)
+            }else{
+                if(board[move].piece.color !== movinggrid.piece.color){
+                    moves.push(move)
                 
-            }
+                }
+            
             break;
+            }
         }
         if (king){
-            break
+            if(board[id].piece.castle === true && check === false){
+                if (board[move].piece){
+                    if(board[move].piece.name === "Rook" && board[move].piece.castle === true){
+                        moves.push(move)
+                    }else{
+                        break
+                    }
+                }
+
+            }else{
+                break
+            }
         }
     }
     return moves

@@ -13,6 +13,8 @@ class King {
         this.color = color
         var pieceImgs = ["whitekin" , "blackkin"]
         this.image = color === "white" ? pieceImgs[0] : pieceImgs[1]
+        this.castle = true
+        this.checked = false
     }
 }
 
@@ -31,6 +33,7 @@ class Rook {
         this.color = color
         var pieceImgs = ["whiteroo" , "blackroo"]
         this.image = color === "white" ? pieceImgs[0] : pieceImgs[1]
+        this.castle = true
     }
 }
 

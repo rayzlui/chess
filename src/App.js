@@ -30,10 +30,9 @@ class App extends React.Component {
       //we can check if the checkmate, if not we switch players and let current player know they're being checked.
       if (this.state.board.checkMate(this.state.nextplayer)){
         //tell current player they've been check mated game over
-        alert("GAME OVER")
+        alert(`CHECK MATE, GAME OVER. ${this.state.currentPlayer} WINS!`)
         this.setState({gameOver: true})
 
-        this.setState({currentplayer: this.state.nextplayer, nextplayer: this.state.currentplayer, playerChecked: true})
       }else{
         //let current player know they've been checked.
         this.setState({currentplayer: this.state.nextplayer, nextplayer: this.state.currentplayer, playerChecked: true})

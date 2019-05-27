@@ -25,7 +25,7 @@ class GameBoard extends React.Component{
             this.setState({selectedpiece: null, moveoptions: []})
             this.props.switchPlayers()
         }else{
-            alert("This move owuld cause you to be checked")
+            alert("This move would cause you to be checked")
         }
     }
 
