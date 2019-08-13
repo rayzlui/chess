@@ -1,5 +1,5 @@
-import { movePieceOnBoard } from "./movefunction";
-import getMoves from "./helperFunctons/pieceMoves";
+import { movePieceOnBoard } from "./moveFunctions";
+import { getMoves } from "./pieceMoves";
 import { copyBoard } from "./copiesBoard";
 
 export function isCheck(allColorPieces, gameboard) {
@@ -25,10 +25,10 @@ export function isCheckMate(attackingPieces, board, defendingPieces) {
   //checkmate goes through every piece of the player being checked, gets every move for each piece and
   //checks each move and sees if it still results in a check with that move. remember check function is the aggressors pieces.
 
-  var piecesLocations = attackingPieces.slice();
+  var piecesLocations = defendingPieces.slice();
   for (let i = 0; i < piecesLocations.length; i++) {
     var indexOfPiece = piecesLocations[i];
-    let rival = defendingPieces.slice()
+    let rival = attackingPieces.slice();
 
     var moves = getMoves(indexOfPiece, board);
     for (let j = 0; j < moves.length; j++) {
@@ -54,5 +54,5 @@ export function willMoveCauseCheck(board, previous, target, rival) {
     opponentPieces.splice(opponentAtTarget, 1);
   }
   //we just need the board to check
-  return gameCheck(opponentPieces, moveOnBoard);
+  return isCheck(opponentPieces, moveOnBoard);
 }

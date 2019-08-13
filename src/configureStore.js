@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from "redux";
 import logger from "redux-logger";
-import { rootReducer } from "./reducers/rootReducers";
+import { rootReducer } from "./reducers/rootReducer";
 
 export function configureStore() {
   const middlewares = [];

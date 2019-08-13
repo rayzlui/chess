@@ -5,7 +5,7 @@ import {
   setRook,
   setPawn,
   setKnight
-} from "./setup";
+} from "./placePieces";
 
 export function setupPlayingBoard() {
   const board = [];
@@ -22,12 +22,13 @@ export function setupPlayingBoard() {
 export function startingPieceLocations(color) {
   let locations = [];
   for (let i = 0; i < 16; i++) {
-    if (color === "white") {
+    if (color === "black") {
       locations.push(i);
     } else {
       locations.push(i + 48);
     }
   }
+  return locations;
 }
 
 export function placePieces(color, board) {

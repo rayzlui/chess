@@ -2,7 +2,7 @@ export function Pawn(color) {
   return {
     name: "Pawn",
     color: color,
-    image: color === "white" ? "whitepawn" : "whitepawn"
+    image: color === "white" ? "whitepawn" : "blackpawn"
   };
 }
 

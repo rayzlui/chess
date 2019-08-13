@@ -3,7 +3,7 @@ import { King, Queen, Rook, Knight, Bishop, Pawn } from "./pieceCreaters";
 function setPawn(color, board) {
   let row = color === "white" ? 48 : 8;
   return board.map((grid, index) => {
-    if (index >= row && index <= row + 8) {
+    if (index >= row && index < row + 8) {
       let piece = new Pawn(color);
       grid.piece = piece;
       return grid;
@@ -41,7 +41,7 @@ function setHigherLevel(color, type, spot, board) {
   var row = color === "white" ? LAST_ROW : TOP_ROW;
   var spots = spot.map(rowIndex => rowIndex + row);
   return board.map((grid, index) => {
-    if (spots.include(index)) {
+    if (spots.includes(index)) {
       let piece = new type(color);
       grid.piece = piece;
       return grid;

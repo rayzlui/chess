@@ -1,4 +1,4 @@
-import { copyBoard } from "./board";
+import { copyBoard } from "./copiesBoard";
 
 //these are dispatches.
 
@@ -16,3 +16,4 @@ export function updatePieceIndex(allColorPieces, previous, target) {
   allPieces.splice(index, 1, target);
   return allPieces;
 }
+ 
