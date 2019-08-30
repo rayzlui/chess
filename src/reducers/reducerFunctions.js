@@ -85,7 +85,7 @@ export function runMove(state, action, colorMove) {
     if (copyCurrentPiece.name === 'Pawn') {
       copyCurrentPiece = rankUpPawn(copyCurrentPiece, target, board);
       if (target === enpassant - 8) {
-        blackPieces = updatePieces(defending, enpassant);
+        defending = updatePieces(defending, enpassant);
         board[enpassant].piece = null;
       }
       if (Math.abs(previous - target) === 16) {
