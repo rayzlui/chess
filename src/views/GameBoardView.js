@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Grid } from "./GridView";
-import { getMoves } from "../helperFunctons/pieceMoves";
-import { willMoveCauseCheck } from "../helperFunctons/checkFunctions";
+import React, { useState } from 'react';
+import { Grid } from './GridView';
+import { getMoves } from '../helperFunctons/pieceMoves';
+import { willMoveCauseCheck } from '../helperFunctons/checkFunctions';
+import PropTypes from 'prop-types';
 
 function GameBoard(props) {
   const {
@@ -12,7 +13,7 @@ function GameBoard(props) {
     moveWhite,
     moveBlack,
     enpassant,
-    check
+    check,
   } = props;
   const [legalMoves, updateMoveOptions] = useState([]);
   const [selectedPiece, changePiece] = useState(null);
@@ -20,31 +21,22 @@ function GameBoard(props) {
   let x = 0;
   let row = [];
   let flip = 0;
-  let movePiece = turn === "white" ? moveWhite : moveBlack;
-  let opponentPiece = turn === "white" ? blackPieces : whitePieces;
-  console.log({
-    board,
-    turn,
-    whitePieces,
-    blackPieces,
-    moveWhite,
-    moveBlack,
-    enpassant,
-    check
-  });
+  let movePiece = turn === 'white' ? moveWhite : moveBlack;
+  let opponentPiece = turn === 'white' ? blackPieces : whitePieces;
+
   for (let i = 0; i < board.length; i++) {
     let element;
     let color;
     let click;
-    color = i % 2 === flip ? "white" : "blue";
+    color = i % 2 === flip ? 'white' : 'blue';
 
     let image = board[i].piece ? board[i].piece.image : null;
 
     if (board[i].piece) {
       //if it's white's turn we want only white to have click and vice versa.
-      if (turn === "white") {
+      if (turn === 'white') {
         click =
-          board[i].piece.color === "white"
+          board[i].piece.color === 'white'
             ? () => {
                 changePiece(i);
                 updateMoveOptions(getMoves(i, board, enpassant, check));
@@ -52,7 +44,7 @@ function GameBoard(props) {
             : () => null;
       } else {
         click =
-          board[i].piece.color === "black"
+          board[i].piece.color === 'black'
             ? () => {
                 changePiece(i);
                 updateMoveOptions(getMoves(i, board, enpassant, check));
@@ -62,19 +54,19 @@ function GameBoard(props) {
     }
     if (legalMoves.includes(i)) {
       let targetMove = i;
-      color = "green";
+      color = 'green';
       click = () => {
         let causesCheck = willMoveCauseCheck(
           board,
           selectedPiece,
           targetMove,
-          opponentPiece
+          opponentPiece,
         );
         if (!causesCheck) {
           movePiece(selectedPiece, i); // this will be a dispatch
           updateMoveOptions([]);
         } else {
-          alert("This move will cause you to be checked.");
+          alert('This move will cause you to be checked.');
         }
       };
     }
@@ -89,10 +81,21 @@ function GameBoard(props) {
     }
   }
   return (
-    <div className="gameboard" style={{ backgroundColor: "black" }}>
-      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>{display}</ul>
+    <div className="gameboard" style={{ backgroundColor: 'black' }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{display}</ul>
     </div>
   );
 }
 
 export default GameBoard;
+
+GameBoard.propTypes = {
+  board: PropTypes.object,
+  turn: PropTypes.bool,
+  whitePieces: PropTypes.array,
+  blackPieces: PropTypes.array,
+  moveWhite: PropTypes.func,
+  moveBlack: PropTypes.func,
+  enpassant: PropTypes.bool,
+  check: PropTypes.bool,
+};
