@@ -21,8 +21,8 @@ function GameBoard(props) {
   let x = 0;
   let row = [];
   let flip = 0;
-  let movePiece = turn === 'white' ? moveWhite : moveBlack;
-  let opponentPiece = turn === 'white' ? blackPieces : whitePieces;
+  let [movePiece, opponentPiece] =
+    turn === 'white' ? [moveWhite, blackPieces] : [moveBlack, whitePieces];
 
   for (let i = 0; i < board.length; i++) {
     let element;
@@ -30,13 +30,14 @@ function GameBoard(props) {
     let click;
     color = i % 2 === flip ? 'white' : 'blue';
 
-    let image = board[i].piece ? board[i].piece.image : null;
-
-    if (board[i].piece) {
+    let image = null;
+    let pieceAtI = board[i].piece;
+    if (pieceAtI) {
       //if it's white's turn we want only white to have click and vice versa.
+      image = pieceAtI.image;
       if (turn === 'white') {
         click =
-          board[i].piece.color === 'white'
+          pieceAtI.color === 'white'
             ? () => {
                 changePiece(i);
                 updateMoveOptions(getMoves(i, board, enpassant, check));
@@ -44,7 +45,7 @@ function GameBoard(props) {
             : () => null;
       } else {
         click =
-          board[i].piece.color === 'black'
+          pieceAtI.color === 'black'
             ? () => {
                 changePiece(i);
                 updateMoveOptions(getMoves(i, board, enpassant, check));

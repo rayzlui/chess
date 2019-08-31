@@ -4,8 +4,8 @@ import {
   setBishop,
   setRook,
   setPawn,
-  setKnight
-} from "./placePieces";
+  setKnight,
+} from './placePieces';
 
 export function setupPlayingBoard() {
   const board = [];
@@ -13,8 +13,8 @@ export function setupPlayingBoard() {
     let grid = { piece: null };
     board.push(grid);
   }
-  let placeWhite = placePieces("white", board);
-  let placeBlack = placePieces("black", placeWhite);
+  let placeWhite = placePieces('white', board);
+  let placeBlack = placePieces('black', placeWhite);
 
   return placeBlack;
 }
@@ -22,7 +22,7 @@ export function setupPlayingBoard() {
 export function startingPieceLocations(color) {
   let locations = [];
   for (let i = 0; i < 16; i++) {
-    if (color === "black") {
+    if (color === 'black') {
       locations.push(i);
     } else {
       locations.push(i + 48);

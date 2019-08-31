@@ -3,7 +3,7 @@ import {
   startingPieceLocations,
   setupPlayingBoard,
 } from '../helperFunctons/setupStart';
-import { runMove } from './reducerFunctions';
+import { runMove } from '../helperFunctons/reducerFunctions';
 
 const initialState = {
   board: setupPlayingBoard(),

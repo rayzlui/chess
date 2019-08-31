@@ -1,4 +1,4 @@
-import { CHECKMATE, WHITE_MOVE, BLACK_MOVE } from "./actionTypes";
+import { WHITE_MOVE, BLACK_MOVE } from './actionTypes';
 
 export function moveWhite(previous, target) {
   return { type: WHITE_MOVE, previous: previous, target: target };

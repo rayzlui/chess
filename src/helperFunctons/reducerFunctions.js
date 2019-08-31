@@ -1,6 +1,6 @@
-import { copyBoard } from '../helperFunctons/copiesBoard';
-import { rankUpPawn } from '../helperFunctons/pawnRankUp';
-import { isCheck, isCheckMate } from '../helperFunctons/checkFunctions';
+import { copyBoard } from './copiesBoard';
+import { rankUpPawn } from './pawnRankUp';
+import { isCheck, isCheckMate } from './checkFunctions';
 
 export function isCastleMove(board, previous, target, color) {
   let shouldBeKing = board[previous].piece;
@@ -66,8 +66,8 @@ export function runMove(state, action, colorMove) {
   let whitePieces = state.whitePieces.slice();
   let board = copyBoard(state.board);
   let updatedEnpassant = null;
-  let check = state.check;
-  let checkMate = state.checkMate;
+  let check = false;
+  let checkMate = false;
   let enpassant = state.enpassant;
   let [attacking, defending] =
     colorMove === 'white'
