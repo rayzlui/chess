@@ -8,10 +8,10 @@ import {
 } from './placePieces';
 
 export function makeBoard() {
-  const board = [];
+  //we could just make this an object that has keys 0 - 63 and our 'moves' can just be Board[spot] = piece and Board[oldSpot] = null
+  const board = {};
   for (var i = 0; i < 64; i++) {
-    let grid = { piece: null };
-    board.push(grid);
+    board[i] = null;
   }
   return board;
 }

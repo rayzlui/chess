@@ -4,9 +4,9 @@ import { copyBoard } from "./copiesBoard";
 
 export function movePieceOnBoard(currentBoard, previous, target) {
   let board = copyBoard(currentBoard);
-  let piece = board[previous].piece;
-  board[previous].piece = null;
-  board[target].piece = piece;
+  let piece = board[previous];
+  board[previous] = null;
+  board[target] = piece;
   return board;
 }
 

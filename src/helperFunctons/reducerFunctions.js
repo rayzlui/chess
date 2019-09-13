@@ -3,8 +3,8 @@ import { rankUpPawn } from './pawnRankUp';
 import { isCheck, isCheckMate } from './checkFunctions';
 
 export function isCastleMove(board, previous, target, color) {
-  let shouldBeKing = board[previous].piece;
-  let shouldBeRook = board[target].piece;
+  let shouldBeKing = board[previous];
+  let shouldBeRook = board[target];
   if (shouldBeKing === null || shouldBeRook === null) return false;
   if (color === 'white') {
     return (
@@ -25,8 +25,8 @@ export function castleMove(board, pieces, previous, target) {
   let isLeft = target % 8 === 0 ? 1 : -1;
   let kingsLanding = target + isLeft;
   let rooksLanding = target + isLeft * 2;
-  board[previous].piece.castle = false;
-  board[target].piece.castle = false;
+  board[previous].castle = false;
+  board[target].castle = false;
   board = movePieceOnBoard(board, previous, kingsLanding);
   board = movePieceOnBoard(board, target, rooksLanding);
   pieces = updatePieces(pieces, previous, kingsLanding);
@@ -45,10 +45,8 @@ export function updatePieces(pieces, previous, target) {
 }
 
 export function movePieceOnBoard(board, previous, target) {
-  let pieceLocation = board[previous];
-  let targetLocation = board[target];
-  targetLocation.piece = pieceLocation.piece;
-  pieceLocation.piece = null;
+  board[target] = board[previous];
+  board[previous] = null;
   return board;
 }
 
@@ -77,7 +75,7 @@ export function runMove(state, action, colorMove) {
   if (isCastleMove(board, previous, target, 'white')) {
     board = castleMove(board, attacking, previous, target);
   } else {
-    let piece = board[previous].piece;
+    let piece = board[previous];
     let copyCurrentPiece = Object.assign({}, piece);
     if (copyCurrentPiece.castle) {
       copyCurrentPiece.castle = false;
@@ -86,7 +84,7 @@ export function runMove(state, action, colorMove) {
       copyCurrentPiece = rankUpPawn(copyCurrentPiece, target, board);
       if (target === enpassant - 8) {
         defending = updatePieces(defending, enpassant);
-        board[enpassant].piece = null;
+        board[enpassant] = null;
       }
       if (Math.abs(previous - target) === 16) {
         updatedEnpassant = target;

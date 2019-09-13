@@ -10,9 +10,9 @@ export function isCheck(allColorPieces, gameboard) {
     let allMoves = getMoves(piece, board);
     for (let j = 0; j < allMoves.length; j++) {
       let move = allMoves[j];
-      if (board[move].piece) {
+      if (board[move]) {
         const notMyPiece = !allColorPieces.includes(move);
-        if (board[move].piece.name === 'King' && notMyPiece) {
+        if (board[move].name === 'King' && notMyPiece) {
           return true;
         }
       }

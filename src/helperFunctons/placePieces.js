@@ -2,15 +2,12 @@ import { King, Queen, Rook, Knight, Bishop, Pawn } from './pieceCreaters';
 
 function setPawn(color, board) {
   let row = color === 'white' ? 48 : 8;
-  return board.map((grid, index) => {
-    if (index >= row && index < row + 8) {
-      let piece = new Pawn(color);
-      grid.piece = piece;
-      return grid;
-    } else {
-      return grid;
-    }
-  });
+  for (let i = 0; i < 8; i++) {
+    let location = i + row;
+    let piece = new Pawn(color);
+    board[location] = piece;
+  }
+  return board;
 }
 
 function setRook(color, board) {
@@ -40,15 +37,11 @@ function setHigherLevel(color, type, spot, board) {
   const TOP_ROW = 0;
   var row = color === 'white' ? LAST_ROW : TOP_ROW;
   var spots = spot.map(rowIndex => rowIndex + row);
-  return board.map((grid, index) => {
-    if (spots.includes(index)) {
-      let piece = new type(color);
-      grid.piece = piece;
-      return grid;
-    } else {
-      return grid;
-    }
+  spots.forEach(spot => {
+    let piece = new type(color);
+    board[spot] = piece;
   });
+  return board;
 }
 
 export { setKing, setQueen, setBishop, setRook, setPawn, setKnight };

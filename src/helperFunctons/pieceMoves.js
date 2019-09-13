@@ -5,11 +5,11 @@ function whitePawn(currentLocation, board, enpassant) {
   }
   return pawnMove({
     board: board,
-    color: "white",
+    color: 'white',
     currentLocation: currentLocation,
     direction: -1,
     startingLocations: startingLocations,
-    enpassant: enpassant
+    enpassant: enpassant,
   });
 }
 function blackPawn(currentLocation, board, enpassant) {
@@ -19,11 +19,11 @@ function blackPawn(currentLocation, board, enpassant) {
   }
   return pawnMove({
     board: board,
-    color: "black",
+    color: 'black',
     currentLocation: currentLocation,
     direction: 1,
     startingLocations: startingLocations,
-    enpassant: enpassant
+    enpassant: enpassant,
   });
 }
 
@@ -35,7 +35,7 @@ function pawnMove(options) {
     color,
     direction,
     startingLocations,
-    enpassant
+    enpassant,
   } = options;
   //first move, attackable options, en passe, normal move
   let moves = [];
@@ -45,12 +45,12 @@ function pawnMove(options) {
     //if it's an end of board we return it. however, this should already have been ranked up.
     return moves;
   }
-  if (board[basicMoveForward].piece === null) {
+  if (board[basicMoveForward] === null) {
     moves.push(basicMoveForward);
     if (
       //first move from starting location allows two moves.
       startingLocations.includes(currentLocation) &&
-      board[basicMoveForward + 8 * direction].piece === null
+      board[basicMoveForward + 8 * direction] === null
     ) {
       moves.push(basicMoveForward + 8 * direction);
     }
@@ -59,8 +59,8 @@ function pawnMove(options) {
   let rightedge = leftedge.map(x => x + 7);
   if (
     //if there's a piece adjacent forward that can be taken
-    board[basicMoveForward - 1].piece &&
-    board[basicMoveForward - 1].piece.color !== color &&
+    board[basicMoveForward - 1] &&
+    board[basicMoveForward - 1].color !== color &&
     !leftedge.includes(basicMoveForward)
   ) {
     moves.push(basicMoveForward - 1);
@@ -69,8 +69,8 @@ function pawnMove(options) {
   if (
     //if there's a piece adjacent forward that can be taken
 
-    board[basicMoveForward + 1].piece &&
-    board[basicMoveForward + 1].piece.color !== color &&
+    board[basicMoveForward + 1] &&
+    board[basicMoveForward + 1].color !== color &&
     !rightedge.includes(basicMoveForward)
   ) {
     moves.push(basicMoveForward + 1);
@@ -92,14 +92,14 @@ function pawnMove(options) {
 
 function kingMove(currentLocation, board, check) {
   let moves = rookMove(currentLocation, board, true, check).concat(
-    bishopMove(currentLocation, board, 2)
+    bishopMove(currentLocation, board, 2),
   );
   return moves;
 }
 
 function queenMove(currentLocation, board) {
   let move = bishopMove(currentLocation, board).concat(
-    rookMove(currentLocation, board)
+    rookMove(currentLocation, board),
   );
   return move;
 }
@@ -111,7 +111,7 @@ function rookMove(currentLocation, board, king = false, check = false) {
     king,
     check,
     currentLocation % 8,
-    -1
+    -1,
   );
   let direction2 = straightMoves(
     board,
@@ -119,7 +119,7 @@ function rookMove(currentLocation, board, king = false, check = false) {
     king,
     check,
     7 - (currentLocation % 8),
-    1
+    1,
   );
   let direction3 = straightMoves(
     board,
@@ -127,7 +127,7 @@ function rookMove(currentLocation, board, king = false, check = false) {
     king,
     check,
     Math.floor(currentLocation / 8),
-    -8
+    -8,
   );
   let direction4 = straightMoves(
     board,
@@ -135,7 +135,7 @@ function rookMove(currentLocation, board, king = false, check = false) {
     king,
     check,
     Math.floor((63 - currentLocation) / 8),
-    8
+    8,
   );
 
   return direction1.concat(direction2.concat(direction3.concat(direction4)));
@@ -147,28 +147,21 @@ function straightMoves(board, currentLocation, king, check, limit, direction) {
     let move = currentLocation + direction * i;
 
     if (!(king && i > 1)) {
-      if (board[move].piece === null) {
+      if (board[move] === null) {
         moves.push(move);
       } else {
-        if (board[move].piece.color !== board[currentLocation].piece.color) {
+        if (board[move].color !== board[currentLocation].color) {
           moves.push(move);
         }
 
         return moves;
       }
     }
-    if (
-      king &&
-      check === false &&
-      board[currentLocation].piece.castle === true
-    ) {
+    if (king && check === false && board[currentLocation].castle === true) {
       //if current piece is king and its not castled nor in check
-      if (board[move].piece) {
+      if (board[move]) {
         //in the loop, if there is a piece here
-        if (
-          board[move].piece.name === "Rook" &&
-          board[move].piece.castle === true
-        ) {
+        if (board[move].name === 'Rook' && board[move].castle === true) {
           //and that piece is a rook and it is not castled.
           moves.push(move);
           return moves;
@@ -195,7 +188,7 @@ function bishopMove(currentLocation, board, dist = 10) {
 function rowlimits(currentLocation) {
   return [
     currentLocation - (currentLocation % 8),
-    currentLocation - (currentLocation % 8) + 7
+    currentLocation - (currentLocation % 8) + 7,
   ];
 }
 
@@ -207,10 +200,10 @@ function diagonalMoves(dist, currentLocation, x, y, board) {
       let moveleftrigght = moveupdown + y * i;
       let rowlimit = rowlimits(moveupdown);
       if (moveleftrigght >= rowlimit[0] && moveleftrigght <= rowlimit[1]) {
-        if (board[moveleftrigght].piece === null) {
+        if (board[moveleftrigght] === null) {
           moves.push(moveleftrigght);
         } else {
-          if (board[moveleftrigght].piece.color !== board[currentLocation].piece.color) {
+          if (board[moveleftrigght].color !== board[currentLocation].color) {
             moves.push(moveleftrigght);
           }
           break;
@@ -236,7 +229,7 @@ function knightMove(currentLocation, board) {
     [2, 1],
     [2, -1],
     [-2, 1],
-    [-2, -1]
+    [-2, -1],
   ];
   let leftrightlimits = rowlimits(currentLocation);
   movements.forEach(arr => {
@@ -250,8 +243,8 @@ function knightMove(currentLocation, board) {
       let updownmove = leftrightmove + 8 * arr[1];
       if (updownmove >= 0 && updownmove <= 63) {
         if (
-          board[updownmove].piece === null ||
-          board[updownmove].piece.color !== board[currentLocation].piece.color
+          board[updownmove] === null ||
+          board[updownmove].color !== board[currentLocation].color
         ) {
           moves.push(updownmove);
         }
@@ -265,27 +258,27 @@ function knightMove(currentLocation, board) {
 export function getMoves(currentLocation, board, enpassant, check) {
   //use a switch for name of piece to get possible moves. use color to determine if paths are blocked/can't land there.
   //we can have 4 different arrays that hold the "paths" for piece, each array iterates where the absolute value is further from the grid id.
-  let chosenpiece = board[currentLocation].piece;
- 
+  let chosenpiece = board[currentLocation];
+
   switch (chosenpiece.name) {
-    case "Queen":
+    case 'Queen':
       return queenMove(currentLocation, board);
 
-    case "Bishop":
+    case 'Bishop':
       return bishopMove(currentLocation, board);
 
-    case "Rook":
+    case 'Rook':
       return rookMove(currentLocation, board);
 
-    case "Knight":
+    case 'Knight':
       return knightMove(currentLocation, board);
 
-    case "King":
+    case 'King':
       return kingMove(currentLocation, board, check);
 
     default:
-      return chosenpiece.color === "white"
+      return chosenpiece.color === 'white'
         ? whitePawn(currentLocation, board, enpassant)
         : blackPawn(currentLocation, board, enpassant);
   }
-};
+}

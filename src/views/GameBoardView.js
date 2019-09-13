@@ -24,14 +24,14 @@ function GameBoard(props) {
   let [movePiece, opponentPiece] =
     turn === 'white' ? [moveWhite, blackPieces] : [moveBlack, whitePieces];
 
-  for (let i = 0; i < board.length; i++) {
+  for (let i = 0; i < 64; i++) {
     let element;
     let color;
     let click;
     color = i % 2 === flip ? 'white' : 'blue';
 
     let image = null;
-    let pieceAtI = board[i].piece;
+    let pieceAtI = board[i];
     if (pieceAtI) {
       //if it's white's turn we want only white to have click and vice versa.
       image = pieceAtI.image;
