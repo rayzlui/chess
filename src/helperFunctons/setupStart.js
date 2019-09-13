@@ -7,12 +7,17 @@ import {
   setKnight,
 } from './placePieces';
 
-export function setupPlayingBoard() {
+export function makeBoard() {
   const board = [];
   for (var i = 0; i < 64; i++) {
     let grid = { piece: null };
     board.push(grid);
   }
+  return board;
+}
+
+export function setupPlayingBoard() {
+  const board = makeBoard();
   let placeWhite = placePieces('white', board);
   let placeBlack = placePieces('black', placeWhite);
 

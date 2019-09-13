@@ -1,18 +1,18 @@
-import { movePieceOnBoard } from "./moveFunctions";
-import { getMoves } from "./pieceMoves";
-import { copyBoard } from "./copiesBoard";
+import { movePieceOnBoard } from './moveFunctions';
+import { getMoves } from './pieceMoves';
+import { copyBoard } from './copiesBoard';
 
 export function isCheck(allColorPieces, gameboard) {
   //this needs to know board AND pieces to check if there is check.
-  var board = copyBoard(gameboard);
+  let board = copyBoard(gameboard);
   for (let i = 0; i < allColorPieces.length; i++) {
-    var piece = allColorPieces[i];
-    var allMoves = getMoves(piece, board);
+    let piece = allColorPieces[i];
+    let allMoves = getMoves(piece, board);
     for (let j = 0; j < allMoves.length; j++) {
-      var move = allMoves[j];
+      let move = allMoves[j];
       if (board[move].piece) {
         const notMyPiece = !allColorPieces.includes(move);
-        if (board[move].piece.name === "King" && notMyPiece) {
+        if (board[move].piece.name === 'King' && notMyPiece) {
           return true;
         }
       }
@@ -25,15 +25,15 @@ export function isCheckMate(attackingPieces, board, defendingPieces) {
   //checkmate goes through every piece of the player being checked, gets every move for each piece and
   //checks each move and sees if it still results in a check with that move. remember check function is the aggressors pieces.
 
-  var piecesLocations = defendingPieces.slice();
+  let piecesLocations = defendingPieces.slice();
   for (let i = 0; i < piecesLocations.length; i++) {
-    var indexOfPiece = piecesLocations[i];
+    let indexOfPiece = piecesLocations[i];
     let rival = attackingPieces.slice();
 
-    var moves = getMoves(indexOfPiece, board);
+    let moves = getMoves(indexOfPiece, board);
     for (let j = 0; j < moves.length; j++) {
       let move = moves[j];
-      var causesCheck = willMoveCauseCheck(board, indexOfPiece, move, rival);
+      let causesCheck = willMoveCauseCheck(board, indexOfPiece, move, rival);
 
       if (!causesCheck) {
         return false;
@@ -45,7 +45,7 @@ export function isCheckMate(attackingPieces, board, defendingPieces) {
 
 export function willMoveCauseCheck(board, previous, target, rival) {
   //this function checks if your move causes the mover to be checked, aka your bishop is blocking your king from being checked and you want to move that bishop.
-  var copyboard = copyBoard(board);
+  let copyboard = copyBoard(board);
   let opponentPieces = rival.slice();
 
   let moveOnBoard = movePieceOnBoard(copyboard, previous, target);
