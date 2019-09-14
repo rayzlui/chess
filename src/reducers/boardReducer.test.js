@@ -60,12 +60,12 @@ describe('boardReducer', () => {
     ]);
     expect(board).toHaveLength(64);
     board.forEach(grid => {
-      expect(grid.piece).toEqual(null);
+      expect(grid).toEqual(null);
     });
   });
   describe('WHITE_MOVE', () => {
     let initialBoard = setupPlayingBoard();
-    initialBoard[40] = initialBoard[48].piece;
+    initialBoard[40] = initialBoard[48];
     initialBoard[48] = null;
     let initialWhitePieces = startingPieceLocations('white');
     let initialBlackPieces = startingPieceLocations('black');
@@ -95,12 +95,12 @@ describe('boardReducer', () => {
     expect(whitePieces).toEqual(
       initialWhitePieces.splice(initialWhitePieces.indexOf(1), 1, 8),
     );
-    expect(board[8].piece.name).toEqual(initialBoard[1].piece.name);
-    expect(board[1].piece).toEqual(null);
+    expect(board[8].name).toEqual(initialBoard[1].name);
+    expect(board[1]).toEqual(null);
   });
   describe('BLACK_MOVE', () => {
     let initialBoard = setupPlayingBoard();
-    initialBoard[23] = initialBoard[2].piece;
+    initialBoard[23] = initialBoard[2];
     initialBoard[2] = null;
     let initialWhitePieces = startingPieceLocations('white');
     let initialBlackPieces = startingPieceLocations('black');
@@ -130,7 +130,7 @@ describe('boardReducer', () => {
     expect(blackPieces).toEqual(
       initialBlackPieces.splice(initialBlackPieces.indexOf(52), 1, 44),
     );
-    expect(board[44].piece.name).toEqual(initialBoard[52].piece.name);
-    expect(board[52].piece).toEqual(null);
+    expect(board[44].name).toEqual(initialBoard[52].name);
+    expect(board[52]).toEqual(null);
   });
 });
