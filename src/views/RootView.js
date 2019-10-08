@@ -8,12 +8,12 @@ export function RootView(props) {
   let header;
   let checkMessage = null;
   if (checkMate) {
-    header = <p>{`Game Over ${turn} Wins!`.toUpperCase()}</p>;
+    header = <p className="turn">{`Game Over ${turn} Wins!`.toUpperCase()}</p>;
   } else {
-    header = <p>{`${turn} TURN`.toUpperCase()}</p>;
+    header = <p className="turn">{`${turn} TURN`.toUpperCase()}</p>;
   }
   if (check) {
-    checkMessage = 'CHECK';
+    checkMessage = <p className="check">{'CHECK'}</p>;
   }
 
   return (

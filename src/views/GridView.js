@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 export function Grid(props) {
   const { click, piece, color, id } = props;
   return (
-    <div
+    <section
       className={'grid' + id}
       style={{
         backgroundColor: color,
@@ -19,7 +19,7 @@ export function Grid(props) {
       onClick={click}
     >
       {piece}
-    </div>
+    </section>
   );
 }
 
