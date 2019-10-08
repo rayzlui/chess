@@ -1,44 +1,12 @@
-function whitePawn(currentLocation, board, enpassant) {
-  let startingLocations = [];
-  for (let i = 48; i <= 55; i++) {
-    startingLocations.push(i);
-  }
-  return pawnMove({
-    board: board,
-    color: 'white',
-    currentLocation: currentLocation,
-    direction: -1,
-    startingLocations: startingLocations,
-    enpassant: enpassant,
-  });
-}
-function blackPawn(currentLocation, board, enpassant) {
-  let startingLocations = [];
-  for (let i = 8; i <= 15; i++) {
-    startingLocations.push(i);
-  }
-  return pawnMove({
-    board: board,
-    color: 'black',
-    currentLocation: currentLocation,
-    direction: 1,
-    startingLocations: startingLocations,
-    enpassant: enpassant,
-  });
-}
-
-function pawnMove(options) {
+export function pawnMove(currentLocation, board, color, enpassant) {
   //for en passant if pawn is on the 4th row from bottom or top aka 32 - 39 and 40 - 48 and opponent piece jumps two forward.
-  const {
-    currentLocation,
-    board,
-    color,
-    direction,
-    startingLocations,
-    enpassant,
-  } = options;
   //first move, attackable options, en passe, normal move
+  const dependencies = {
+    white: [-1, [48, 49, 50, 51, 52, 53, 54, 55]],
+    black: [1, [8, 9, 10, 11, 12, 13, 14, 15]],
+  };
   let moves = [];
+  let [direction, startingLocations] = dependencies[color];
   //basic move
   let basicMoveForward = currentLocation + direction * 8;
   if (basicMoveForward > 63 || basicMoveForward < 0) {
@@ -90,21 +58,21 @@ function pawnMove(options) {
   return moves;
 }
 
-function kingMove(currentLocation, board, check) {
+export function kingMove(currentLocation, board, check) {
   let moves = rookMove(currentLocation, board, true, check).concat(
     bishopMove(currentLocation, board, 2),
   );
   return moves;
 }
 
-function queenMove(currentLocation, board) {
+export function queenMove(currentLocation, board) {
   let move = bishopMove(currentLocation, board).concat(
     rookMove(currentLocation, board),
   );
   return move;
 }
 
-function rookMove(currentLocation, board, king = false, check = false) {
+export function rookMove(currentLocation, board, king = false, check = false) {
   let direction1 = straightMoves(
     board,
     currentLocation,
@@ -141,8 +109,15 @@ function rookMove(currentLocation, board, king = false, check = false) {
   return direction1.concat(direction2.concat(direction3.concat(direction4)));
 }
 
-function straightMoves(board, currentLocation, king, check, limit, direction) {
-  var moves = [];
+export function straightMoves(
+  board,
+  currentLocation,
+  king,
+  check,
+  limit,
+  direction,
+) {
+  let moves = [];
   for (let i = 1; i <= limit; i++) {
     let move = currentLocation + direction * i;
 
@@ -175,9 +150,9 @@ function straightMoves(board, currentLocation, king, check, limit, direction) {
   return moves;
 }
 
-function bishopMove(currentLocation, board, dist = 10) {
+export function bishopMove(currentLocation, board, dist = 10) {
   //moves: until limit or piece, essentially its [[-1,-1],[1,-1],[-1,1],[1,1]] until it reaches an edge or piece
-
+  //it's just +/- 7 and 9 until there's a blockage or end of board
   let direction1 = diagonalMoves(dist, currentLocation, -1, -1, board);
   let direction2 = diagonalMoves(dist, currentLocation, 1, -1, board);
   let direction3 = diagonalMoves(dist, currentLocation, 1, 1, board);
@@ -185,16 +160,16 @@ function bishopMove(currentLocation, board, dist = 10) {
 
   return direction1.concat(direction2.concat(direction3.concat(direction4)));
 }
-function rowlimits(currentLocation) {
+export function rowlimits(currentLocation) {
   return [
     currentLocation - (currentLocation % 8),
     currentLocation - (currentLocation % 8) + 7,
   ];
 }
 
-function diagonalMoves(dist, currentLocation, x, y, board) {
+export function diagonalMoves(dist, currentLocation, x, y, board) {
   let moves = [];
-  for (var i = 1; i < dist; i++) {
+  for (let i = 1; i < dist; i++) {
     let moveupdown = currentLocation + x * i * 8;
     if (moveupdown < 64 && moveupdown >= 0) {
       let moveleftrigght = moveupdown + y * i;
@@ -218,9 +193,10 @@ function diagonalMoves(dist, currentLocation, x, y, board) {
   return moves;
 }
 
-function knightMove(currentLocation, board) {
+export function knightMove(currentLocation, board) {
   //move: 3, limit or piece on it. all combos of +-1,+-2
   let moves = [];
+  //essentially possible moves are [-17, -15, -10, -6, +6, +10, +15, +17], but the math doesn't work on the sides aka "teleporting to other side of board"
   let movements = [
     [1, 2],
     [-1, 2],
@@ -278,7 +254,7 @@ export function getMoves(currentLocation, board, enpassant, check) {
 
     default:
       return chosenpiece.color === 'white'
-        ? whitePawn(currentLocation, board, enpassant)
-        : blackPawn(currentLocation, board, enpassant);
+        ? pawnMove(currentLocation, board, 'white', enpassant)
+        : pawnMove(currentLocation, board, 'black', enpassant);
   }
 }
