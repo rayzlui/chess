@@ -1,9 +1,13 @@
-import { WHITE_MOVE, BLACK_MOVE } from './actionTypes';
+import { MOVE, WHITE_MOVE, BLACK_MOVE } from './actionTypes';
 
-export function moveWhite(previous, target) {
-  return { type: WHITE_MOVE, previous: previous, target: target };
+export function movePiece(previous, target, color) {
+  return { type: MOVE, previous: previous, target: target, colorMove: color };
 }
 
-export function moveBlack(previous, target) {
-  return { type: BLACK_MOVE, previous: previous, target: target };
+export function moveWhite() {
+  return { type: WHITE_MOVE };
+}
+
+export function moveBlack() {
+  return { type: BLACK_MOVE };
 }
