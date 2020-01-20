@@ -17,18 +17,13 @@ export function RootView(props) {
   }
 
   return (
-    <div
-      className="chess-container"
-      style={{ textAlign: 'center', display: 'inline-block' }}
-    >
-      <div className="chess-header">
+    <div className="chess__container">
+      <section className="chess__header">
         <h1>CHESS GAME!</h1>
         {header}
         {checkMessage}
-      </div>
-      <div className="chess-board">
-        <GameBoardContainer />
-      </div>
+      </section>
+      <GameBoardContainer />
     </div>
   );
 }

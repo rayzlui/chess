@@ -4,20 +4,7 @@ import PropTypes from 'prop-types';
 export function Grid(props) {
   const { click, piece, color, id } = props;
   return (
-    <section
-      className={'grid' + id}
-      style={{
-        backgroundColor: color,
-        height: '60px',
-        width: '60px',
-        borderWidth: '5px',
-        borderColor: 'black',
-        display: 'inline-block',
-        margin: 1,
-        verticalAlign: 'top',
-      }}
-      onClick={click}
-    >
+    <section className={`grid ${id} ${color}`} key={id} onClick={click}>
       {piece}
     </section>
   );

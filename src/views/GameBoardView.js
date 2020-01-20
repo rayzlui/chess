@@ -58,9 +58,9 @@ export function GameBoard(props) {
     }
   }
   return (
-    <div className="gameboard" style={{ backgroundColor: 'black' }}>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{display}</ul>
-    </div>
+    <section className="gameboard">
+      <ul className="board__row">{display}</ul>
+    </section>
   );
 }
 
